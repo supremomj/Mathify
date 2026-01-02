@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mathify — Student Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="student-dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="../assets/Mathify Logo.png" alt="Mathify" class="sidebar-logo">
+      <h2 class="sidebar-title">Mathify</h2>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-page="dashboard">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span class="nav-text">Dashboard</span>
+      </div>
+      <div class="nav-item" data-page="lessons">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+        </svg>
+        <span class="nav-text">Lessons</span>
+      </div>
+      <div class="nav-item" data-page="progress">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+        <span class="nav-text">Progress</span>
+      </div>
+      <div class="nav-item" data-page="achievements">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+        </svg>
+        <span class="nav-text">Achievements</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="handleLogout()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+        <span class="nav-text">Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1 class="greeting">Welcome back, <span id="studentName">Student</span>!</h1>
+        <p class="sub-greeting">Ready to continue your math adventure?</p>
+      </div>
+      <div class="header-stats">
+        <div class="stat-badge">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+          </svg>
+          <div>
+            <div class="stat-value" id="levelCount">1</div>
+            <div class="stat-label">Level</div>
+          </div>
+        </div>
+        <div class="stat-badge">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <div class="stat-value" id="coinsCount">0</div>
+            <div class="stat-label">Coins</div>
+          </div>
+        </div>
+        <div class="stat-badge">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          <div>
+            <div class="stat-value" id="streakCount">0</div>
+            <div class="stat-label">Streak</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Page -->
+    <div class="page active" id="page-dashboard">
+      <!-- Quick Actions -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Quick Actions</h2>
+        </div>
+        <div class="action-grid">
+          <button class="action-card primary" id="mainActionBtn" onclick="continueLearning()">
+            <div class="action-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="action-content">
+              <h3 class="action-title">Start Learning</h3>
+              <p class="action-desc">Continue your math journey</p>
+            </div>
+            <div class="action-arrow">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </div>
+          </button>
+          
+          <div class="action-card" onclick="switchPage('lessons')">
+            <div class="action-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+            <div class="action-content">
+              <h3 class="action-title">View Lessons</h3>
+              <p class="action-desc">Browse all topics</p>
+            </div>
+            <div class="action-arrow">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Current Lesson -->
+      <section class="section" id="currentLessonSection" style="display: none;">
+        <div class="section-header">
+          <h2 class="section-title">Current Lesson</h2>
+        </div>
+        <div class="lesson-card" id="currentLessonCard">
+          <div class="lesson-content">
+            <h3 class="lesson-title" id="currentLessonTitle">Loading...</h3>
+            <p class="lesson-desc" id="currentLessonDesc">Your current learning progress</p>
+            <div class="lesson-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" id="currentLessonProgress" style="width: 0%"></div>
+              </div>
+              <span class="progress-text" id="currentLessonProgressText">0%</span>
+            </div>
+          </div>
+          <button class="btn-continue" onclick="continueLearning()">Continue →</button>
+        </div>
+      </section>
+
+      <!-- Stats Grid -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Your Progress</h2>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <div class="stat-card-content">
+              <div class="stat-card-value" id="overallProgress">0%</div>
+              <div class="stat-card-label">Overall Progress</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="stat-card-content">
+              <div class="stat-card-value" id="lessonsCompleted">0</div>
+              <div class="stat-card-label">Lessons Completed</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+              </svg>
+            </div>
+            <div class="stat-card-content">
+              <div class="stat-card-value" id="averageScore">0%</div>
+              <div class="stat-card-label">Average Score</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="stat-card-content">
+              <div class="stat-card-value" id="timeSpent">0m</div>
+              <div class="stat-card-label">Time Spent</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Daily Tasks -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Daily Tasks</h2>
+        </div>
+        <div class="tasks-list" id="dailyTasks">
+          <div class="loading-state">Loading your daily tasks...</div>
+        </div>
+      </section>
+
+      <!-- AI Recommendations -->
+      <section class="section" id="aiSuggestionsSection" style="display: none;">
+        <div class="section-header">
+          <h2 class="section-title">🤖 AI Recommendations</h2>
+        </div>
+        <div class="ai-suggestions" id="aiSuggestions">
+          <div class="loading-state">Loading personalized recommendations...</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Lessons Page -->
+    <div class="page" id="page-lessons">
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Learning Path</h2>
+          <span class="section-subtitle">Grade <span id="studentGradeDisplay2">?</span></span>
+        </div>
+        <div class="learning-path" id="learningPathLessons">
+          <div class="loading-state">Loading your learning path...</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Progress Page -->
+    <div class="page" id="page-progress">
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Detailed Progress</h2>
+        </div>
+        <div class="progress-details">
+          <div class="progress-card">
+            <h3>Overall Statistics</h3>
+            <div class="progress-stats">
+              <div class="progress-stat-item">
+                <span class="progress-stat-label">Completion Rate</span>
+                <span class="progress-stat-value" id="completionRate">0%</span>
+              </div>
+              <div class="progress-stat-item">
+                <span class="progress-stat-label">Total Lessons</span>
+                <span class="progress-stat-value" id="totalLessons">0</span>
+              </div>
+              <div class="progress-stat-item">
+                <span class="progress-stat-label">Average Score</span>
+                <span class="progress-stat-value" id="avgScoreDetail">0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Achievements Page -->
+    <div class="page" id="page-achievements">
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Your Achievements</h2>
+        </div>
+        <div class="achievements-grid">
+          <div class="achievement-card">
+            <div class="achievement-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+              </svg>
+            </div>
+            <h3 class="achievement-title">First Steps</h3>
+            <p class="achievement-desc">Complete your first lesson</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Grade Selection Modal -->
+  <div id="gradeModal" class="modal">
+    <div class="modal-content">
+      <h2 class="modal-title">Set Your Grade</h2>
+      <p class="modal-desc">Please select your grade to start learning</p>
+      <select id="gradeSelect" class="modal-select">
+        <option value="">Select your grade...</option>
+        <option value="1">Grade 1</option>
+        <option value="2">Grade 2</option>
+        <option value="3">Grade 3</option>
+        <option value="4">Grade 4</option>
+        <option value="5">Grade 5</option>
+        <option value="6">Grade 6</option>
+      </select>
+      <div id="gradeError" class="error-message"></div>
+      <button onclick="saveGrade()" class="btn-primary-modal">Save Grade</button>
+    </div>
+  </div>
+
+  <script src="student-dashboard.js"></script>
+  <script src="render.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "mathify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "backend/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "db:view": "node scripts/db-helper.js view",
+    "db:init": "node scripts/db-helper.js init",
+    "db:reset": "node scripts/db-helper.js reset",
+    "db:help": "node scripts/db-helper.js help",
+    "seed:curriculum": "node scripts/seed-curriculum.js",
+    "seed:grade1": "node scripts/seed-grade1-quarters.js",
+    "seed:grade2": "node scripts/seed-grade2-quarters.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "openai": "^4.20.0"
+  },
+  "devDependencies": {
+    "electron": "^39.2.0"
+  }
+}
