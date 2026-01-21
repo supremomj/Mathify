@@ -461,6 +461,36 @@ ipcMain.handle('complete-daily-task', async (event, taskId) => {
   }
 })
 
+ipcMain.handle('save-achievement', async (event, userId, achievementData) => {
+  try {
+    const result = await db.saveAchievement(userId, achievementData)
+    return result
+  } catch (error) {
+    console.error('Error saving achievement:', error)
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('get-user-achievements', async (event, userId) => {
+  try {
+    const achievements = await db.getUserAchievements(userId)
+    return { success: true, achievements: achievements }
+  } catch (error) {
+    console.error('Error getting user achievements:', error)
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('has-achievement', async (event, userId, achievementType) => {
+  try {
+    const has = await db.hasAchievement(userId, achievementType)
+    return { success: true, has: has }
+  } catch (error) {
+    console.error('Error checking achievement:', error)
+    return { success: false, error: error.message }
+  }
+})
+
 // Rule-based AI handlers
 ipcMain.handle('analyze-student-performance', async (event, userId, grade) => {
   try {

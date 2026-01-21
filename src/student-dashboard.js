@@ -802,40 +802,40 @@ let currentUser = null;
         // Generate hints based on question type and content
         if (question.type === 'multiple-choice') {
           // Hint 1: General guidance
-          hints.push(`💡 Hint 1: Read the question carefully. Think about what the question is asking.`);
+          hints.push(`Hint 1: Read the question carefully. Think about what the question is asking.`);
           
           // Hint 2: Process hint
           if (question.question.includes('+') || question.question.includes('add')) {
-            hints.push(`💡 Hint 2: This is an addition problem. Count or add the numbers together.`);
+            hints.push(`Hint 2: This is an addition problem. Count or add the numbers together.`);
           } else if (question.question.includes('-') || question.question.includes('subtract') || question.question.includes('left')) {
-            hints.push(`💡 Hint 2: This is a subtraction problem. Take away the smaller number from the larger one.`);
+            hints.push(`Hint 2: This is a subtraction problem. Take away the smaller number from the larger one.`);
           } else if (question.question.includes('×') || question.question.includes('times')) {
-            hints.push(`💡 Hint 2: This is a multiplication problem. Multiply the numbers together.`);
+            hints.push(`Hint 2: This is a multiplication problem. Multiply the numbers together.`);
           } else {
-            hints.push(`💡 Hint 2: Work through each step carefully.`);
+            hints.push(`Hint 2: Work through each step carefully.`);
           }
           
           // Hint 3: Closer hint
           const correctAnswer = question.options[question.correctAnswer];
-          hints.push(`💡 Hint 3: The answer is ${correctAnswer}. Try working it out step by step!`);
+          hints.push(`Hint 3: The answer is ${correctAnswer}. Try working it out step by step!`);
           
         } else {
           // Number input questions
-          hints.push(`💡 Hint 1: Break down the problem into smaller steps.`);
+          hints.push(`Hint 1: Break down the problem into smaller steps.`);
           
           if (question.question.includes('+')) {
             const parts = question.question.match(/\d+/g);
             if (parts && parts.length >= 2) {
-              hints.push(`💡 Hint 2: Add ${parts[0]} + ${parts[1]} to find your answer.`);
+              hints.push(`Hint 2: Add ${parts[0]} + ${parts[1]} to find your answer.`);
             }
           } else if (question.question.includes('-')) {
             const parts = question.question.match(/\d+/g);
             if (parts && parts.length >= 2) {
-              hints.push(`💡 Hint 2: Subtract ${parts[1]} from ${parts[0]} to find your answer.`);
+              hints.push(`Hint 2: Subtract ${parts[1]} from ${parts[0]} to find your answer.`);
             }
           }
           
-          hints.push(`💡 Hint 3: The correct answer is ${question.correctAnswer}.`);
+          hints.push(`Hint 3: The correct answer is ${question.correctAnswer}.`);
         }
         
         return hints[hintLevel] || hints[hints.length - 1];
@@ -873,7 +873,7 @@ let currentUser = null;
         if (percentage === 100 && !this.achievements.perfectScore) {
           this.achievements.perfectScore = true;
           achievements.push({
-            icon: '🏆',
+            icon: '',
             title: 'Perfect Score!',
             message: 'You got 100%! Outstanding work!'
           });
@@ -883,7 +883,7 @@ let currentUser = null;
         if (this.consecutiveCorrect >= 5 && !this.achievements.onFire) {
           this.achievements.onFire = true;
           achievements.push({
-            icon: '🔥',
+            icon: '',
             title: 'On Fire!',
             message: '5 correct answers in a row! You\'re unstoppable!'
           });
@@ -893,7 +893,7 @@ let currentUser = null;
         if (percentage >= 90 && score >= 9 && !this.achievements.sharpshooter) {
           this.achievements.sharpshooter = true;
           achievements.push({
-            icon: '🎯',
+            icon: '',
             title: 'Sharpshooter!',
             message: '90%+ accuracy! Incredible precision!'
           });
@@ -966,14 +966,15 @@ let currentUser = null;
         document.body.appendChild(gameContainer);
       }
 
-      renderGameScreen(gameContainer, topic);
+      await renderGameScreen(gameContainer, topic);
     }
 
     // Render game screen
-    function renderGameScreen(container, topic) {
+    async function renderGameScreen(container, topic) {
       if (currentGame.currentQuestion >= currentGame.questions.length) {
         // Game completed - auto save and show results
-        saveGameProgressAuto(topic);
+        // Wait for save to complete so nextTopic is set
+        await saveGameProgressAuto(topic);
         showGameResults(container, topic);
         return;
       }
@@ -1070,13 +1071,11 @@ let currentUser = null;
               border: 1px solid rgba(148, 163, 184, 0.1);
             ">
               <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 32px;">📝</span>
                 <span style="color: #f1f5f9; font-weight: 600; font-family: 'Inter', sans-serif; font-size: 18px;">
                   Question ${currentGame.currentQuestion + 1} of ${currentGame.totalQuestions}
                 </span>
               </div>
               <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 32px;">⭐</span>
                 <span style="color: #6366f1; font-weight: 600; font-family: 'Inter', sans-serif; font-size: 18px;">
                   Score: ${currentGame.score}
                 </span>
@@ -1166,7 +1165,7 @@ let currentUser = null;
                 gap: 8px;
               " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(251, 191, 36, 0.6)';"
               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(251, 191, 36, 0.4)';">
-                💡 Get Hint ${currentGame.currentHintLevel < 3 ? `(${2 - currentGame.currentHintLevel} left)` : ''}
+                Get Hint ${currentGame.currentHintLevel < 3 ? `(${2 - currentGame.currentHintLevel} left)` : ''}
               </button>
             </div>
             
@@ -1292,9 +1291,9 @@ let currentUser = null;
           hintButton.disabled = true;
           hintButton.style.opacity = '0.5';
           hintButton.style.cursor = 'not-allowed';
-          hintButton.innerHTML = '💡 No More Hints';
+          hintButton.innerHTML = 'No More Hints';
         } else {
-          hintButton.innerHTML = `💡 Get Hint (${3 - currentGame.currentHintLevel} left)`;
+          hintButton.innerHTML = `Get Hint (${3 - currentGame.currentHintLevel} left)`;
         }
       }
       
@@ -1312,7 +1311,7 @@ let currentUser = null;
       if (question.question.includes('+') || question.question.includes('add') || question.question.includes('together') || question.question.includes('total')) {
         if (numbers.length >= 2) {
           explanation = `
-            <strong>💡 Here's how to solve it:</strong><br>
+            <strong>Here's how to solve it:</strong><br>
             • This is an addition problem<br>
             • Add ${numbers[0]} + ${numbers[1]}<br>
             • ${numbers[0]} + ${numbers[1]} = ${correctAnswer}<br>
@@ -1324,7 +1323,7 @@ let currentUser = null;
       } else if (question.question.includes('-') || question.question.includes('subtract') || question.question.includes('left') || question.question.includes('more')) {
         if (numbers.length >= 2) {
           explanation = `
-            <strong>💡 Here's how to solve it:</strong><br>
+            <strong>Here's how to solve it:</strong><br>
             • This is a subtraction problem<br>
             • Take away the smaller number from the larger one<br>
             • ${Math.max(...numbers.map(Number))} - ${Math.min(...numbers.map(Number))} = ${correctAnswer}<br>
@@ -1336,7 +1335,7 @@ let currentUser = null;
       } else if (question.question.includes('×') || question.question.includes('times') || question.question.includes('multiply')) {
         if (numbers.length >= 2) {
           explanation = `
-            <strong>💡 Here's how to solve it:</strong><br>
+            <strong>Here's how to solve it:</strong><br>
             • This is a multiplication problem<br>
             • Multiply ${numbers[0]} × ${numbers[1]}<br>
             • ${numbers[0]} × ${numbers[1]} = ${correctAnswer}<br>
@@ -1347,7 +1346,7 @@ let currentUser = null;
         }
       } else {
         explanation = `
-          <strong>💡 Think about it step by step:</strong><br>
+          <strong>Think about it step by step:</strong><br>
           • Read the question carefully<br>
           • Work through each step<br>
           • The correct answer is ${correctAnswer}<br>
@@ -1399,21 +1398,50 @@ let currentUser = null;
           true
         );
         
+        // Save achievements to backend
+        if (achievements.length > 0 && currentUser) {
+          achievements.forEach(async achievement => {
+            try {
+              // Map achievement titles to types for backend
+              const achievementTypeMap = {
+                'Perfect Score!': 'perfect_score',
+                'On Fire!': 'on_fire',
+                'Sharpshooter!': 'sharpshooter'
+              };
+              const achievementType = achievementTypeMap[achievement.title] || achievement.title.toLowerCase().replace(/[^a-z0-9]/g, '_');
+              
+              // Check if already earned
+              const hasResult = await window.electronAPI.invoke('has-achievement', currentUser.id, achievementType);
+              if (!hasResult.has) {
+                await window.electronAPI.invoke('save-achievement', currentUser.id, {
+                  achievementType: achievementType,
+                  title: achievement.title,
+                  message: achievement.message,
+                  topicId: currentGame.topic ? currentGame.topic.id : null
+                });
+              }
+            } catch (error) {
+              console.error('Error saving achievement:', error);
+            }
+          });
+        }
+        
         let achievementHTML = '';
         if (achievements.length > 0) {
           achievements.forEach(achievement => {
             achievementHTML += `
               <div style="
-                background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-                color: #856404;
+                background: rgba(245, 158, 11, 0.15);
+                border: 1px solid rgba(245, 158, 11, 0.3);
+                color: #fbbf24;
                 padding: 15px;
                 border-radius: 10px;
                 margin-top: 10px;
-                font-family: 'Fredoka', sans-serif;
+                font-family: 'Inter', sans-serif;
                 font-size: 18px;
                 font-weight: 600;
                 text-align: center;
-                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+                box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
                 animation: pulse 1s ease-in-out infinite;
               ">
                 ${achievement.icon} ${achievement.title}! ${achievement.message}
@@ -1428,22 +1456,21 @@ let currentUser = null;
         
         feedbackDiv.innerHTML = `
           <div style="
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            color: #155724;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
             padding: 25px;
             border-radius: 15px;
             text-align: center;
-            font-family: 'Fredoka', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 22px;
             font-weight: 600;
-            box-shadow: 0 6px 20px rgba(21, 87, 36, 0.3);
-            border: 2px solid #c3e6cb;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
             animation: slideInUp 0.4s ease-out;
             position: relative;
             overflow: hidden;
           ">
-            <div style="font-size: 40px; margin-bottom: 10px; animation: bounce 0.6s ease-in-out;">✅</div>
-            <div>Correct! Great job! 🎉</div>
+            <div>Correct! Great job!</div>
             ${achievementHTML}
           </div>
         `;
@@ -1472,13 +1499,13 @@ let currentUser = null;
             animation: slideInUp 0.4s ease-out;
           ">
             <div style="text-align: center; margin-bottom: 15px; font-size: 24px; font-weight: 600;">
-              ❌ Incorrect
+              Incorrect
             </div>
             <div style="background: rgba(30, 41, 59, 0.5); padding: 15px; border-radius: 10px; font-size: 16px; line-height: 1.6; color: #cbd5e1;">
               ${explanation}
             </div>
             <div style="text-align: center; margin-top: 15px; font-size: 16px; font-weight: 600;">
-              Don't worry! Keep practicing! 💪
+              Don't worry! Keep practicing!
             </div>
           </div>
         `;
@@ -1488,10 +1515,10 @@ let currentUser = null;
       }
 
       // Move to next question after 2.5 seconds (longer to read explanations)
-      setTimeout(() => {
+      setTimeout(async () => {
         currentGame.currentQuestion++;
         const gameContainer = document.getElementById('gameContainer');
-        renderGameScreen(gameContainer, currentGame.topic);
+        await renderGameScreen(gameContainer, currentGame.topic);
       }, 2500);
     }
 
@@ -1507,17 +1534,41 @@ let currentUser = null;
       // Check all possible achievements
       if (percentage === 100) {
         allAchievements.push({
-          icon: '🏆',
+          icon: '',
           title: 'Perfect Score!',
-          message: 'You got 100%! Outstanding work!'
+          message: 'You got 100%! Outstanding work!',
+          type: 'perfect_score'
         });
       }
       
       if (percentage >= 90) {
         allAchievements.push({
-          icon: '🎯',
+          icon: '',
           title: 'Sharpshooter!',
-          message: '90%+ accuracy! Incredible precision!'
+          message: '90%+ accuracy! Incredible precision!',
+          type: 'sharpshooter'
+        });
+      }
+      
+      // Save achievements to backend
+      if (allAchievements.length > 0 && currentUser) {
+        allAchievements.forEach(async achievement => {
+          try {
+            const achievementType = achievement.type || achievement.title.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            
+            // Check if already earned
+            const hasResult = await window.electronAPI.invoke('has-achievement', currentUser.id, achievementType);
+            if (!hasResult.has) {
+              await window.electronAPI.invoke('save-achievement', currentUser.id, {
+                achievementType: achievementType,
+                title: achievement.title,
+                message: achievement.message,
+                topicId: topic ? topic.id : null
+              });
+            }
+          } catch (error) {
+            console.error('Error saving achievement:', error);
+          }
         });
       }
       
@@ -1544,7 +1595,7 @@ let currentUser = null;
             border-radius: 15px;
             margin: 20px 0;
           ">
-            <h3 style="color: #fbbf24; margin-bottom: 15px; font-size: 20px; font-family: 'Inter', sans-serif;">🏅 Achievements Earned:</h3>
+            <h3 style="color: #fbbf24; margin-bottom: 15px; font-size: 20px; font-family: 'Inter', sans-serif;">Achievements Earned:</h3>
             ${allAchievements.map(ach => `
               <div style="
                 background: rgba(30, 41, 59, 0.5);
@@ -1556,7 +1607,7 @@ let currentUser = null;
                 gap: 15px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.2);
               ">
-                <span style="font-size: 32px;">${ach.icon}</span>
+                ${ach.icon ? `<span style="font-size: 32px;">${ach.icon}</span>` : ''}
                 <div style="text-align: left;">
                   <div style="font-weight: 600; font-size: 18px; color: #f1f5f9; font-family: 'Inter', sans-serif;">${ach.title}</div>
                   <div style="font-size: 14px; color: #cbd5e1;">${ach.message}</div>
@@ -1583,7 +1634,7 @@ let currentUser = null;
               font-family: 'Inter', sans-serif;
               font-size: 16px;
             ">
-              🎊 Congratulations! You completed this lesson!<br>
+              Congratulations! You completed this lesson!<br>
               Next lesson: <strong>${nextTopic.topic_title}</strong>
             </div>
           `;
@@ -1599,7 +1650,7 @@ let currentUser = null;
               font-family: 'Inter', sans-serif;
               font-size: 16px;
             ">
-              🏆 Amazing! You've completed all lessons for your grade!
+              Amazing! You've completed all lessons for your grade!
             </div>
           `;
         }
@@ -1612,38 +1663,45 @@ let currentUser = null;
           display: flex;
           align-items: center;
           justify-content: center;
+          background: #0f172a;
         ">
           <div style="
-            background: white;
-            border-radius: 20px;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 24px;
             padding: 50px;
             max-width: 600px;
             width: 100%;
             text-align: center;
             position: relative;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
           ">
             <button onclick="closeGameInterface()" style="
               position: absolute;
-              top: 15px;
-              right: 15px;
-              background: #e0e0e0;
-              border: none;
+              top: 20px;
+              right: 20px;
+              background: rgba(239, 68, 68, 0.2);
+              border: 1px solid rgba(239, 68, 68, 0.3);
+              color: #fca5a5;
               border-radius: 50%;
-              width: 40px;
-              height: 40px;
-              font-size: 24px;
+              width: 45px;
+              height: 45px;
+              font-size: 26px;
               cursor: pointer;
-              font-family: 'Fredoka', sans-serif;
-              transition: all 0.2s;
-            " onmouseover="this.style.background='#fc8181'; this.style.color='white';"
-            onmouseout="this.style.background='#e0e0e0'; this.style.color='black';">×</button>
+              font-family: 'Inter', sans-serif;
+              transition: all 0.3s;
+              box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: bold;
+            " onmouseover="this.style.background='rgba(239, 68, 68, 0.3)'; this.style.transform='rotate(90deg) scale(1.1)'; this.style.boxShadow='0 6px 20px rgba(239, 68, 68, 0.4)';"
+            onmouseout="this.style.background='rgba(239, 68, 68, 0.2)'; this.style.transform='rotate(0deg) scale(1)'; this.style.boxShadow='0 4px 15px rgba(239, 68, 68, 0.2)';">
+              ×
+            </button>
             
-            <div style="font-size: 100px; margin-bottom: 20px;">
-              ${isCompleted ? '🎉' : '📚'}
-            </div>
-            
-            <h2 style="color: #f1f5f9; margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700;">
+            <h2 style="color: #f1f5f9; margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; margin-top: 20px;">
               ${isCompleted ? 'Great Job!' : 'Keep Practicing!'}
             </h2>
             
@@ -1670,25 +1728,64 @@ let currentUser = null;
             
             ${achievementsHTML}
 
-            <button onclick="closeGameInterface()" style="
-              background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-              color: white;
-              border: none;
-              padding: 18px 50px;
-              border-radius: 25px;
-              font-size: 18px;
-              font-weight: bold;
-              cursor: pointer;
-              font-family: 'Inter', sans-serif;
-              transition: all 0.3s;
-              box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-            " onmouseover="this.style.transform='translateY(-2px) scale(1.05)'; this.style.boxShadow='0 12px 35px rgba(99, 102, 241, 0.5)';"
-            onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 25px rgba(99, 102, 241, 0.4)';">
-              Close
-            </button>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+              ${isFullyCompleted && currentGame.nextTopic ? `
+                <button onclick="proceedToNextQuiz()" style="
+                  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                  color: white;
+                  border: none;
+                  padding: 18px 50px;
+                  border-radius: 25px;
+                  font-size: 18px;
+                  font-weight: bold;
+                  cursor: pointer;
+                  font-family: 'Inter', sans-serif;
+                  transition: all 0.3s;
+                  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+                " onmouseover="this.style.transform='translateY(-2px) scale(1.05)'; this.style.boxShadow='0 12px 35px rgba(16, 185, 129, 0.5)';"
+                onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 25px rgba(16, 185, 129, 0.4)';">
+                  Continue to Next Quiz →
+                </button>
+              ` : ''}
+              <button onclick="closeGameInterface()" style="
+                background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+                color: white;
+                border: none;
+                padding: 18px 50px;
+                border-radius: 25px;
+                font-size: 18px;
+                font-weight: bold;
+                cursor: pointer;
+                font-family: 'Inter', sans-serif;
+                transition: all 0.3s;
+                box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+              " onmouseover="this.style.transform='translateY(-2px) scale(1.05)'; this.style.boxShadow='0 12px 35px rgba(99, 102, 241, 0.5)';"
+              onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 25px rgba(99, 102, 241, 0.4)';">
+                ${isFullyCompleted && currentGame.nextTopic ? 'Close' : 'Close'}
+              </button>
+            </div>
           </div>
         </div>
       `;
+    }
+
+    // Proceed to next quiz automatically
+    window.proceedToNextQuiz = async function() {
+      if (!currentGame || !currentGame.nextTopic) {
+        closeGameInterface();
+        return;
+      }
+
+      const nextTopic = currentGame.nextTopic;
+      
+      // Close current results screen
+      const gameContainer = document.getElementById('gameContainer');
+      if (gameContainer) {
+        gameContainer.remove();
+      }
+
+      // Start next quiz immediately
+      await openGameInterface(nextTopic);
     }
 
     // Auto save game progress (called automatically after game completion)

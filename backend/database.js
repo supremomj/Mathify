@@ -210,6 +210,18 @@ function createTables() {
         used BOOLEAN DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )`,
+      `CREATE TABLE IF NOT EXISTS achievements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        achievement_type TEXT NOT NULL,
+        achievement_title TEXT NOT NULL,
+        achievement_message TEXT,
+        earned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        topic_id INTEGER,
+        session_id INTEGER,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (topic_id) REFERENCES curriculum_topics(id) ON DELETE SET NULL
       )`
     ];
 
@@ -1117,6 +1129,50 @@ function updateUserPassword(userId, newPassword) {
   });
 }
 
+// Save achievement
+function saveAchievement(userId, achievementData) {
+  return new Promise((resolve, reject) => {
+    const { achievementType, title, message, topicId, sessionId } = achievementData;
+    const query = `INSERT INTO achievements (user_id, achievement_type, achievement_title, achievement_message, topic_id, session_id) 
+                   VALUES (?, ?, ?, ?, ?, ?)`;
+    db.run(query, [userId, achievementType, title, message || null, topicId || null, sessionId || null], function(err) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve({ success: true, id: this.lastID });
+    });
+  });
+}
+
+// Get user achievements
+function getUserAchievements(userId) {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT * FROM achievements WHERE user_id = ? ORDER BY earned_at DESC`;
+    db.all(query, [userId], (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(rows || []);
+    });
+  });
+}
+
+// Check if user has specific achievement type
+function hasAchievement(userId, achievementType) {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT COUNT(*) as count FROM achievements WHERE user_id = ? AND achievement_type = ?`;
+    db.get(query, [userId, achievementType], (err, row) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve((row && row.count > 0) || false);
+    });
+  });
+}
+
 // Create admin account (for initial setup)
 function createAdminAccount(adminData) {
   return registerUser(adminData);
@@ -1162,6 +1218,9 @@ module.exports = {
   updateUserPassword,
   recordLoginAttempt,
   isRateLimited,
+  saveAchievement,
+  getUserAchievements,
+  hasAchievement,
   closeDatabase
 };
 
