@@ -198,11 +198,24 @@ class CurriculumQuestionGenerator {
     }
     
     options.sort(() => Math.random() - 0.5);
-    
+
+    // Grade 1: show answer choices as number words (e.g., "thirty-two")
+    if (grade === 1) {
+      const wordOptions = options.map((n) => this.numberToWords(n));
+      return {
+        question: `What number is this: ${num.toLocaleString()}?`,
+        type: 'multiple-choice',
+        options: wordOptions,
+        correctAnswer: options.indexOf(num),
+        icon: '🔢'
+      };
+    }
+
+    // Grade 2+: keep numeric choices
     return {
       question: `What number is this: ${num.toLocaleString()}?`,
       type: 'multiple-choice',
-      options: options.map(n => n.toLocaleString()),
+      options: options.map((n) => n.toLocaleString()),
       correctAnswer: options.indexOf(num),
       icon: '🔢'
     };
@@ -1114,6 +1127,61 @@ class CurriculumQuestionGenerator {
       }
     }
     return ordinals;
+  }
+
+  numberToWords(num) {
+    // Support at least 0–1000; Grade 1 uses up to 100
+    const ones = [
+      'zero',
+      'one',
+      'two',
+      'three',
+      'four',
+      'five',
+      'six',
+      'seven',
+      'eight',
+      'nine',
+      'ten',
+      'eleven',
+      'twelve',
+      'thirteen',
+      'fourteen',
+      'fifteen',
+      'sixteen',
+      'seventeen',
+      'eighteen',
+      'nineteen'
+    ];
+    const tens = [
+      '',
+      '',
+      'twenty',
+      'thirty',
+      'forty',
+      'fifty',
+      'sixty',
+      'seventy',
+      'eighty',
+      'ninety'
+    ];
+
+    if (num < 20) {
+      return ones[num];
+    }
+    if (num < 100) {
+      const t = Math.floor(num / 10);
+      const o = num % 10;
+      return o === 0 ? tens[t] : `${tens[t]}-${ones[o]}`;
+    }
+    if (num < 1000) {
+      const h = Math.floor(num / 100);
+      const rest = num % 100;
+      if (rest === 0) return `${ones[h]} hundred`;
+      return `${ones[h]} hundred ${this.numberToWords(rest)}`;
+    }
+    // Fallback for larger numbers – use locale string
+    return num.toLocaleString();
   }
 
   generateFractionOptions(num, den) {

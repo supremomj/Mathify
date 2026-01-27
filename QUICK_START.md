@@ -19,6 +19,9 @@ npm start
 ```bash
 npm run seed:curriculum
 npm run seed:grade1
+npm run seed:grade2
+npm run seed:grade3
+npm run seed:grade4
 ```
 
 ## ✅ That's it!

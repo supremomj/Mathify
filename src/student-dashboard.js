@@ -1747,22 +1747,22 @@ let currentUser = null;
                   Continue to Next Quiz →
                 </button>
               ` : ''}
-              <button onclick="closeGameInterface()" style="
-                background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-                color: white;
-                border: none;
-                padding: 18px 50px;
-                border-radius: 25px;
-                font-size: 18px;
-                font-weight: bold;
-                cursor: pointer;
-                font-family: 'Inter', sans-serif;
-                transition: all 0.3s;
-                box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-              " onmouseover="this.style.transform='translateY(-2px) scale(1.05)'; this.style.boxShadow='0 12px 35px rgba(99, 102, 241, 0.5)';"
-              onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 25px rgba(99, 102, 241, 0.4)';">
+            <button onclick="closeGameInterface()" style="
+              background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+              color: white;
+              border: none;
+              padding: 18px 50px;
+              border-radius: 25px;
+              font-size: 18px;
+              font-weight: bold;
+              cursor: pointer;
+              font-family: 'Inter', sans-serif;
+              transition: all 0.3s;
+              box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            " onmouseover="this.style.transform='translateY(-2px) scale(1.05)'; this.style.boxShadow='0 12px 35px rgba(99, 102, 241, 0.5)';"
+            onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 25px rgba(99, 102, 241, 0.4)';">
                 ${isFullyCompleted && currentGame.nextTopic ? 'Close' : 'Close'}
-              </button>
+            </button>
             </div>
           </div>
         </div>
