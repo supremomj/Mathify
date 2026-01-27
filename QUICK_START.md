@@ -17,11 +17,7 @@ npm start
 
 ### Step 4: Seed Curriculum Data (Optional but Recommended)
 ```bash
-npm run seed:curriculum
-npm run seed:grade1
-npm run seed:grade2
-npm run seed:grade3
-npm run seed:grade4
+npm run seed:all
 ```
 
 ## ✅ That's it!
