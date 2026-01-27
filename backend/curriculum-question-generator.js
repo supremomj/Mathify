@@ -22,7 +22,12 @@ class CurriculumQuestionGenerator {
     const usedSignatures = new Set();
     const learningOutcome = topic.learning_outcome || '';
     const category = topic.category || 'Operations';
-    const grade = topic.grade || 1;
+    // Normalize grade to a reasonable integer between 1 and 6 so we always
+    // generate questions aligned with the learner's level.
+    let grade = parseInt(topic.grade, 10);
+    if (!grade || isNaN(grade)) grade = 1;
+    if (grade < 1) grade = 1;
+    if (grade > 6) grade = 6;
     const topicCode = topic.topic_code || '';
 
     // Generate questions based on learning outcome keywords and category

@@ -201,8 +201,14 @@ let currentUser = null;
         
         const sessions = sessionsResult.success ? (sessionsResult.sessions || []) : [];
         
-        // Update stats with all available data
+        // Update stats with all available data (for dashboard + basic progress summary)
         updateStats(sessions, topicProgress, curriculumTopics);
+
+        // Load detailed progress metrics for the Progress page
+        updateDetailedProgress(topicProgress, curriculumTopics, sessions);
+
+        // Load achievements for Achievements page
+        loadAchievements();
 
         // Load learning path (curriculum-based)
         loadLearningPath();
@@ -238,7 +244,7 @@ let currentUser = null;
       container.style.display = 'block';
 
       container.innerHTML = `
-        <h3>🤖 Personalized Learning Recommendations</h3>
+        <h3>Personalized Learning Recommendations</h3>
         
         ${analysis.summary ? `
           <div class="suggestion-item">
@@ -292,7 +298,7 @@ let currentUser = null;
       `;
     }
 
-    // Update progress display
+    // Update header and "Current Lesson" block on dashboard
     function updateProgressDisplay() {
       if (!studentProgress) return;
 
@@ -354,6 +360,100 @@ let currentUser = null;
             currentLessonProgressText.textContent = progress + '%';
           }
         }
+      }
+    }
+
+    // Update the Progress tab metrics to reflect real student status
+    function updateDetailedProgress(topicProgress, curriculumTopics, sessions) {
+      const completionRateEl = document.getElementById('completionRate');
+      const totalLessonsEl = document.getElementById('totalLessons');
+      const avgScoreDetailEl = document.getElementById('avgScoreDetail');
+
+      // Guard: if elements are missing, nothing to do
+      if (!completionRateEl && !totalLessonsEl && !avgScoreDetailEl) return;
+
+      const totalTopics = curriculumTopics ? curriculumTopics.length : 0;
+      let completedCount = 0;
+
+      if (topicProgress && topicProgress.length > 0) {
+        completedCount = topicProgress.filter(p =>
+          (p.completed === 1 || p.completed === true) ||
+          (p.progress_percentage >= 100)
+        ).length;
+      }
+
+      // Completion Rate = completed topics / total topics
+      const completionRate = totalTopics > 0 ? Math.round((completedCount / totalTopics) * 100) : 0;
+
+      if (completionRateEl) {
+        completionRateEl.textContent = `${completionRate}%`;
+      }
+
+      if (totalLessonsEl) {
+        totalLessonsEl.textContent = totalTopics;
+      }
+
+      // Average score detail – reuse same calculation as header stats
+      let avgScore = 0;
+      if (sessions && sessions.length > 0) {
+        const totalScore = sessions.reduce((sum, s) => sum + (s.score || 0), 0);
+        const totalQuestions = sessions.reduce((sum, s) => sum + (s.total_questions || 0), 0);
+        avgScore = totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0;
+      } else if (topicProgress && topicProgress.length > 0) {
+        const topicsWithScores = topicProgress.filter(p => p.best_score && p.best_score > 0);
+        if (topicsWithScores.length > 0) {
+          const totalScore = topicsWithScores.reduce((sum, p) => sum + (p.best_score || 0), 0);
+          avgScore = Math.round(totalScore / topicsWithScores.length);
+        }
+      }
+
+      if (avgScoreDetailEl) {
+        avgScoreDetailEl.textContent = `${avgScore}%`;
+      }
+    }
+
+    // Load and render achievements on the Achievements tab
+    async function loadAchievements() {
+      const container = document.querySelector('#page-achievements .achievements-grid');
+      if (!currentUser || !container) return;
+
+      try {
+        const result = await window.electronAPI.invoke('get-user-achievements', currentUser.id);
+        if (!result.success) {
+          console.error('Error loading achievements:', result.error);
+          return;
+        }
+
+        const achievements = result.achievements || [];
+
+        if (achievements.length === 0) {
+          container.innerHTML = `
+            <div class="achievement-card">
+              <div class="achievement-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h3 class="achievement-title">No Achievements Yet</h3>
+              <p class="achievement-desc">Play quizzes and complete lessons to start earning achievements!</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = achievements.map(a => `
+          <div class="achievement-card">
+            <div class="achievement-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+              </svg>
+            </div>
+            <h3 class="achievement-title">${a.title || 'Achievement'}</h3>
+            <p class="achievement-desc">${a.message || ''}</p>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading achievements:', error);
       }
     }
 
@@ -1220,8 +1320,11 @@ let currentUser = null;
               font-family: 'Inter', sans-serif;
               transition: all 0.3s;
               box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            " onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)';"
-            onblur="this.style.borderColor='rgba(148, 163, 184, 0.1)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)';" />
+            " 
+            onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)';"
+            onblur="this.style.borderColor='rgba(148, 163, 184, 0.1)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.1)';"
+            onkeydown="if (event.key === 'Enter') { event.preventDefault(); checkAnswer(); }"
+            />
             <br><br>
             <button onclick="checkAnswer()" style="
               background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
@@ -1245,6 +1348,7 @@ let currentUser = null;
         `;
       }
     }
+
 
     // Show hint function
     window.showHint = async function() {
@@ -1514,12 +1618,69 @@ let currentUser = null;
         achievementTracker.checkAchievements(currentGame.score, currentGame.totalQuestions, false);
       }
 
-      // Move to next question after 2.5 seconds (longer to read explanations)
-      setTimeout(async () => {
-        currentGame.currentQuestion++;
-        const gameContainer = document.getElementById('gameContainer');
-        await renderGameScreen(gameContainer, currentGame.topic);
-      }, 2500);
+      // After showing feedback/tips, ask the student when to proceed.
+      // This keeps the explanation visible until they're ready.
+      const existingPrompt = document.getElementById('nextQuestionPrompt');
+      if (existingPrompt) {
+        existingPrompt.remove();
+      }
+
+      const promptDiv = document.createElement('div');
+      promptDiv.id = 'nextQuestionPrompt';
+      promptDiv.style.marginTop = '20px';
+      promptDiv.innerHTML = `
+        <div style="
+          background: rgba(15, 23, 42, 0.9);
+          border: 1px solid rgba(148, 163, 184, 0.4);
+          padding: 20px;
+          border-radius: 12px;
+          text-align: center;
+          font-family: 'Inter', sans-serif;
+          font-size: 16px;
+          color: #e5e7eb;
+        ">
+          <div style="margin-bottom: 12px;">
+            ${isCorrect
+              ? 'Ready for the next question?'
+              : 'Take your time to read the tips. When you are ready, continue to the next question.'}
+          </div>
+          <button id="nextQuestionBtn" onclick="goToNextQuestion()" style="
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.4);
+          " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 8px 24px rgba(79, 70, 229, 0.55)';"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 18px rgba(79, 70, 229, 0.4)';">
+            Continue
+          </button>
+        </div>
+      `;
+
+      if (feedbackDiv && feedbackDiv.parentNode) {
+        feedbackDiv.parentNode.insertBefore(promptDiv, feedbackDiv.nextSibling);
+      }
+    }
+
+    // Called when the student confirms they want to move on to the next question
+    window.goToNextQuestion = async function() {
+      const btn = document.getElementById('nextQuestionBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+        btn.style.cursor = 'default';
+        btn.textContent = 'Loading...';
+      }
+
+      currentGame.currentQuestion++;
+      const gameContainer = document.getElementById('gameContainer');
+      await renderGameScreen(gameContainer, currentGame.topic);
     }
 
     // Show game results - ENHANCED VERSION
@@ -1915,11 +2076,46 @@ let currentUser = null;
     // Generate game questions based on topic using curriculum-aware generator
     async function generateGameQuestions(topic) {
       try {
+        // Ensure the topic carries the correct grade information for the generator.
+        // If the topic from the database doesn't include grade, fall back to the
+        // currently logged-in student's grade so Grade 2–6 students don't get Grade 1 questions.
+        const effectiveGrade =
+          (topic && (topic.grade || topic.grade === 0) ? topic.grade : null) ||
+          (currentUser && currentUser.studentGrade) ||
+          1;
+
+        const topicForGeneration = {
+          ...topic,
+          grade: effectiveGrade,
+        };
+
         // Try to use curriculum-based question generator first
-        const result = await window.electronAPI.invoke('generate-curriculum-questions', topic, 10);
+        const result = await window.electronAPI.invoke(
+          'generate-curriculum-questions',
+          topicForGeneration,
+          10
+        );
         if (result.success && result.questions && result.questions.length > 0) {
-          console.log('Generated curriculum-based questions:', result.questions.length);
-          return result.questions;
+          // Ensure no duplicate questions inside a quiz (same text/options/answer)
+          const unique = [];
+          const signatures = new Set();
+          for (const q of result.questions) {
+            const sig = `${q.question}|${JSON.stringify(q.options || [])}|${q.correctAnswer}`;
+            if (!signatures.has(sig)) {
+              signatures.add(sig);
+              unique.push(q);
+            }
+          }
+
+          if (unique.length >= 10) {
+            console.log('Generated curriculum-based questions (unique):', unique.length);
+            return unique.slice(0, 10);
+          }
+
+          if (unique.length > 0) {
+            console.log('Generated fewer unique questions than requested:', unique.length);
+            return unique;
+          }
         }
       } catch (error) {
         console.error('Error generating curriculum questions, using fallback:', error);

@@ -526,10 +526,10 @@
       
       if (eventType === 'mousedown' || eventType === 'touchstart') {
         passwordField.type = 'text';
-        toggleButton.textContent = '🙈';
+        toggleButton.textContent = 'Hide';
       } else if (eventType === 'mouseup' || eventType === 'touchend' || eventType === 'mouseleave') {
         passwordField.type = 'password';
-        toggleButton.textContent = '👁️';
+        toggleButton.textContent = 'Show';
       }
     }
 

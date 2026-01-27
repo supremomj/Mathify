@@ -1449,7 +1449,7 @@
 
           <!-- AI-Generated Learning Summary -->
           <div class="ai-summary">
-            <h3>🤖 AI-Generated Learning Summary</h3>
+            <h3>AI-Generated Learning Summary</h3>
             <div id="aiSummaryContent" class="ai-summary-content">
               <p style="text-align: center; opacity: 0.8;">
                 Select a student to view their personalized learning insights.
@@ -1605,7 +1605,9 @@
                   <input type="email" id="modalStudentEmail" placeholder="Email" required />
                   <div class="password-wrapper">
                     <input type="password" id="modalStudentPassword" placeholder="Password" required />
-                    <button type="button" class="password-toggle" onclick="toggleModalPassword('modalStudentPassword')">🙈</button>
+                    <button type="button" class="password-toggle" onclick="toggleModalPassword('modalStudentPassword')">
+                      <span class="icon-eye"></span>
+                    </button>
                   </div>
                   <div id="modalGradeWrapper">
                     <select id="modalStudentGrade">
@@ -1634,9 +1636,9 @@
       <div id="page6" class="page">
         <div class="container">
           <div class="table-card">
-            <div class="table-header">
+                <div class="table-header">
               <div>
-                <div class="table-header-title">👩‍🏫 Teacher Accounts</div>
+                <div class="table-header-title">Teacher Accounts</div>
                 <div class="table-header-subtitle">Manage all teacher accounts and their grade assignments.</div>
               </div>
               <div class="table-toolbar">
@@ -1689,7 +1691,9 @@
                   <input type="email" id="modalTeacherEmail" placeholder="Email" required />
                   <div class="password-wrapper">
                     <input type="password" id="modalTeacherPassword" placeholder="Password" required />
-                    <button type="button" class="password-toggle" onclick="toggleModalPassword('modalTeacherPassword')">🙈</button>
+                    <button type="button" class="password-toggle" onclick="toggleModalPassword('modalTeacherPassword')">
+                      <span class="icon-eye"></span>
+                    </button>
                   </div>
                   <div id="modalTeacherGradesWrapper">
                     <label style="font-weight: 600; color: #cbd5e1; margin-bottom: 8px; display: block; font-family: 'Inter', sans-serif;">Grade Levels Taught (select one or more)</label>
@@ -1815,11 +1819,11 @@
           </div>
 
           <div class="card">
-            <h3>🤖 AI Insights & Alerts</h3>
+            <h3>AI Insights & Alerts</h3>
             <div class="ai-summary">
               <div id="aiSummaryGuide" class="ai-summary-content">
                 <div style="text-align: center; padding: 40px 30px; opacity: 0.9;">
-                  <div style="font-size: 48px; margin-bottom: 15px;">🤖</div>
+                  <div style="font-size: 48px; margin-bottom: 15px;">AI</div>
                   <h4 style="color: rgba(255,255,255,0.95); font-size: 20px; margin-bottom: 10px; font-weight: 600;">AI-Powered Insights</h4>
                   <p style="color: rgba(255,255,255,0.85); font-size: 15px; line-height: 1.6; max-width: 600px; margin: 0 auto;">
                     When a student is selected, the AI analyzes their activity to highlight strengths, gaps, and recommended topics. Use these insights to plan targeted practice and interventions.
@@ -2406,10 +2410,10 @@
       const toggle = input.nextElementSibling;
       if (input.type === 'password') {
         input.type = 'text';
-        toggle.textContent = '👁️';
+        toggle.textContent = 'Hide';
       } else {
         input.type = 'password';
-        toggle.textContent = '🙈';
+        toggle.textContent = 'Show';
       }
     }
 
